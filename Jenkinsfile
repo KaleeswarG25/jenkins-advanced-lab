@@ -12,6 +12,30 @@ pipeline {
     }
 
     stages {
+        stage('System Info') {
+            steps {
+                bat 'hostname'
+                bat 'whoami'
+            }
+        }
+
+        stage('CPU Info') {
+            steps {
+                bat 'echo Total Core Count: %NUMBER_OF_PROCESSORS%'
+            }
+        }
+
+        stage('Memory Info') {
+            steps {
+                bat 'systeminfo | findstr "Memory"'
+            }
+        }
+
+        stage('Kernel Info') {
+            steps {
+                bat 'ver'
+            }
+        }
         stage('Map-Based Library Test') {
             steps {
                 script {
