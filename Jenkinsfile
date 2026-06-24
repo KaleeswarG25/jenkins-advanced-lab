@@ -25,8 +25,6 @@ pipeline {
         stage('Variables') {
             steps {
                 bat 'echo %APP_NAME%'
-                // Challenge 2 & 3: Print all env vars and specific Jenkins ones
-                bat 'set'
                 bat 'echo Current Build: %BUILD_NUMBER%'
                 bat 'echo Job Name: %JOB_NAME%'
                 bat 'echo Workspace Path: %WORKSPACE%'
@@ -35,7 +33,6 @@ pipeline {
 
         stage('Workspace') {
             steps {
-                // Challenge 1: Print workspace path and list files
                 bat 'cd'
                 bat 'dir'
             }
@@ -43,7 +40,6 @@ pipeline {
 
         stage('Create Artifact') {
             steps {
-                // DevOps Task: Create directory and write a file
                 bat '''
                 if not exist build mkdir build
                 echo CloudCart Build > build\\app.txt
@@ -51,17 +47,28 @@ pipeline {
                 '''
             }
         }
+
+        // NEW: Production Deployment Stage with Human Approval Gate
+        stage('Deploy to Production') {
+            // This stage will only run if the user chose 'prod' in the parameters
+            when {
+                expression { return params.ENV == 'prod' }
+            }
+            steps {
+                echo "🚨 CRITICAL: Requesting production deployment clearance..."
+
+                // Interactive prompt that pauses the entire pipeline
+                input message: 'Do you want to approve deploying this artifact to Production?', ok: 'Deploy Now!'
+
+                echo "🚀 Deploying artifact app.txt to Production environment..."
+                bat 'echo [PROD DEPLOY DONE] > build\\deploy_status.txt'
+            }
+        }
     }
 
     post {
-        success {
-            echo 'Build Successful'
-        }
-        failure {
-            echo 'Build Failed'
-        }
-        always {
-            echo 'Always Executed'
-        }
+        success { echo 'Build Successful' }
+        failure { echo 'Build Failed' }
+        always  { echo 'Always Executed' }
     }
 }
