@@ -13,14 +13,16 @@ pipeline {
     stages {
         stage('System Info') {
             steps {
-                sh 'hostname'
-                sh 'whoami'
-                sh 'date'
+                // Changed from 'sh' to 'bat' for Windows compatibility
+                bat 'hostname'
+                bat 'whoami'
+                bat 'date /t'
             }
         }
         stage('Variables') {
             steps {
-                sh 'echo $APP_NAME'
+                // Windows uses %VARIABLE% instead of $VARIABLE
+                bat 'echo %APP_NAME%'
             }
         }
         stage('Environment Check') {
